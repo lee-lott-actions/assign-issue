@@ -1,0 +1,17 @@
+{
+  "name": "assign-issue",
+  "version": "1.0.0",
+  "description": "A GitHub Action to assign a specified user to a GitHub issue using the GitHub API.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

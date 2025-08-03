@@ -1,0 +1,38 @@
+name: Assign Issue
+description: A GitHub Action to assign a GitHub issue to a specified user using the GitHub API
+author: Louisiana Office of Technology Services
+
+inputs:
+  issue-number:
+    description: 'The issue number to assign'
+    required: true
+  assignee:
+    description: 'The GitHub username to assign the issue to'
+    required: true
+  token:
+    description: 'GitHub token with repository read access'
+    required: true    
+  owner:
+    description: 'The owner of the repository'
+    required: true
+  repo-name:
+    description: 'The name of the repository'
+    required: true
+
+outputs:
+  result:
+    description: 'Result of the assignment attempt ("success", "already-assigned", or "failure")'
+    value: ${{ steps.action.outputs.result }}
+  error-message:
+    description: 'Error message if the assignment fails'
+    value: ${{ steps.action.outputs.error-message }}
+
+runs:
+  using: composite
+  steps:
+    - name: Assign Issue
+      id: action
+      run: |
+        source ${{ github.action_path }}/action.sh        
+        assign_issue "${{ inputs.issue-number }}" "${{ inputs.assignee }}" "${{ inputs.token }}" "${{ inputs.owner }}" "${{ inputs.repo-name }}"
+      shell: bash
