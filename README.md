@@ -42,7 +42,7 @@ This GitHub Action assigns a GitHub issue to a specified user using the GitHub A
        steps:
          - name: Assign Issue
            id: assign
-           uses: lee-lott-actions/assign-issue@v1.0.0
+           uses: lee-lott-actions/assign-issue@v1
            with:
              issue-number: ${{ github.event.issue.number }}
              assignee: 'username'
