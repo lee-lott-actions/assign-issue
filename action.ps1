@@ -74,7 +74,7 @@ function Add-IssueAssignee {
 
         try {
             $assignResp = Invoke-WebRequest -Uri $assignUri -Headers $headers -Method Post -Body $body
-			
+			Write-Host "DEBUG: Status Code = $($assignResp.StatusCode)"
 		    if ($assignResp.StatusCode -ne 201) {
 				Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
 				Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to assign issue to $Assignee. Status: $($assignResp.StatusCode)"
