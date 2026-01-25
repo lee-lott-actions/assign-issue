@@ -32,7 +32,7 @@ runs:
   steps:
     - name: Assign Issue
       id: action
+      shell: pwsh
       run: |
-        source ${{ github.action_path }}/action.sh        
-        assign_issue "${{ inputs.issue-number }}" "${{ inputs.assignee }}" "${{ inputs.token }}" "${{ inputs.owner }}" "${{ inputs.repo-name }}"
-      shell: bash
+        . "${{ github.action_path }}/action.ps1"
+        Add-IssueAssignee "${{ inputs.issue-number }}" "${{ inputs.assignee }}" "${{ inputs.token }}" "${{ inputs.owner }}" "${{ inputs.repo-name }}"
