@@ -60,7 +60,7 @@ Describe "Add-IssueAssignee" {
         $script:$called = 0
         Mock Invoke-WebRequest {
             $script:$called++
-            if ($called -eq 1) {
+            if ($script:$called -eq 1) {
                 [PSCustomObject]@{ StatusCode = 200; Content = '{"assignees": []}' }
             } else {
                 [PSCustomObject]@{ StatusCode = 403; Content = '{"message": "Forbidden"}' }
