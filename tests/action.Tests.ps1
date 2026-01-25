@@ -60,6 +60,7 @@ Describe "Add-IssueAssignee" {
         $called = 0
         Mock Invoke-WebRequest {
             $called++
+            Write-Host "Mock Invoke-WebRequest called count: $called"
             if ($called -eq 1) {
                 [PSCustomObject]@{ StatusCode = 200; Content = '{"assignees": []}' }
             } else {
