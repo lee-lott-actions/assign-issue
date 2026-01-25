@@ -57,10 +57,10 @@ Describe "Add-IssueAssignee" {
     }
 
     It "assign_issue fails to assign issue with HTTP 403" {
-        $script:$called = 0
+        $script:called = 0
         Mock Invoke-WebRequest {
-            $script:$called++
-            if ($script:$called -eq 1) {
+            $script:called++
+            if ($script:called -eq 1) {
                 [PSCustomObject]@{ StatusCode = 200; Content = '{"assignees": []}' }
             } else {
                 [PSCustomObject]@{ StatusCode = 403; Content = '{"message": "Forbidden"}' }
