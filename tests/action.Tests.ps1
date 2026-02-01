@@ -53,7 +53,7 @@ Describe "Add-IssueAssignee" {
         Add-IssueAssignee -IssueNumber $IssueNumber -Assignee $Assignee -Token $Token -Owner $Owner -RepoName $RepoName
         $output = Get-Content $env:GITHUB_OUTPUT
         $output | Should -Contain "result=failure"
-        $output | Should -Contain "error-message=Failed to fetch issue details. Status: 404"
+        $output | Should -Contain "error-message=Error: Failed to fetch issue details. Status: 404"
     }
 
     It "assign_issue fails to assign issue with HTTP 403" {
