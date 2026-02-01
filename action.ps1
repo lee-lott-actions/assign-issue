@@ -84,11 +84,10 @@ function Add-IssueAssignee {
 				Write-Host "Successfully assigned issue #$IssueNumber to $Assignee"
 			}
         } catch {
-            $httpStatus = $_.Exception.Response.StatusCode.value__
-            Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-            Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to assign issue to $Assignee. Status: $httpStatus"
-            Write-Host "Error: Failed to assign issue to $Assignee. Status: $httpStatus"
-            return
+			$errorMsg = "Error: Failed to assign issue to $Assignee. Exception: $($_.Exception.Message)"
+			Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
+			Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=$errorMsg"
+			Write-Host $errorMsg
         }
     }
 }
