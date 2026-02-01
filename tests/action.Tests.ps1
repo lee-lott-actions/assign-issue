@@ -117,7 +117,7 @@ Describe "Add-IssueAssignee" {
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=failure"
-		$output | Where-Object { $_ -match "^error-message=Error: Failed to assign issue to $Assignee\. Exception:" } |
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to assign issue to test-user. Exception:" } |
 			Should -Not -BeNullOrEmpty
 	}
 }
