@@ -38,9 +38,10 @@ function Add-IssueAssignee {
         $issueResponse = Invoke-WebRequest -Uri $issueUri -Headers $headers -Method Get
 		
 	    if ($issueResponse.StatusCode -ne 200) {
+			$errorMsg = "Error: Failed to fetch issue details. Status: $($issueResponse.StatusCode)"
 			Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-			Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to fetch issue details. Status: $($issueResponse.StatusCode)"
-			Write-Host "Error: Failed to fetch issue details. Status: $($issueResponse.StatusCode)"
+			Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=$errorMsg"
+			Write-Host $errorMsg
 			return
 		}
     } catch {
