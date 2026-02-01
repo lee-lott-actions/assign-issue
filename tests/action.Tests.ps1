@@ -121,22 +121,14 @@ Describe "Add-IssueAssignee" {
 			Should -Not -BeNullOrEmpty
 	}
 	
-	It "writes result=failure and error-message with Exception when assignment throws (POST catch)" {
-		$script:called = 0
-		Mock Invoke-WebRequest {
-			$script:called++
-			if ($script:called -eq 1) {
-				[PSCustomObject]@{ StatusCode = 200; Content = '{"assignees": []}' }
-			} else {
-				throw "API Error"
-			}
-		}
+	It "writes result=failure and error-message on GET exception" {
+		Mock Invoke-WebRequest { throw "API Error" }
 
 		Add-IssueAssignee -IssueNumber $IssueNumber -Assignee $Assignee -Token $Token -Owner $Owner -RepoName $RepoName
 
 		$output = Get-Content $env:GITHUB_OUTPUT
 		$output | Should -Contain "result=failure"
-		$output | Where-Object { $_ -match "^error-message=Error: Failed to assign issue to $Assignee\. Exception:" } |
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to fetch issue details\. Exception:" } |
 			Should -Not -BeNullOrEmpty
 	}
 	
