@@ -44,10 +44,10 @@ function Add-IssueAssignee {
 			return
 		}
     } catch {
-        $httpStatus = $_.Exception.Response.StatusCode.value__
+        $errorMsg = "Error: Failed to fetch issue details. Exception: $($_.Exception.Message)"
         Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-        Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to fetch issue details. Status: $httpStatus"
-        Write-Host "Error: Failed to fetch issue details. Status: $httpStatus"
+        Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=$errorMsg"
+        Write-Host $errorMsg
         return
     }
 
@@ -76,9 +76,10 @@ function Add-IssueAssignee {
             $assignResp = Invoke-WebRequest -Uri $assignUri -Headers $headers -Method Post -Body $body
 
 			if ($assignResp.StatusCode -ne 201) {
+				$errorMsg = "Error: Failed to assign issue to $Assignee. Status: $($assignResp.StatusCode)"
 				Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
-				Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Failed to assign issue to $Assignee. Status: $($assignResp.StatusCode)"
-				Write-Host "Error: Failed to assign issue to $Assignee. Status: $($assignResp.StatusCode)"
+				Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=$errorMsg"
+				Write-Host $errorMsg
 			} else {
 				Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
 				Write-Host "Successfully assigned issue #$IssueNumber to $Assignee"
