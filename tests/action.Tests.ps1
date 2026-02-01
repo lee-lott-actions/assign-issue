@@ -53,7 +53,7 @@ Describe "Add-IssueAssignee" {
         Add-IssueAssignee -IssueNumber $IssueNumber -Assignee $Assignee -Token $Token -Owner $Owner -RepoName $RepoName
         $output = Get-Content $env:GITHUB_OUTPUT
         $output | Should -Contain "result=failure"
-        $output | Should -Contain "error-message=Failed to fetch issue details. Status: 404"
+        $output | Should -Contain "error-message=Error: Failed to fetch issue details. Status: 404"
     }
 
     It "assign_issue fails to assign issue with HTTP 403" {
@@ -70,7 +70,7 @@ Describe "Add-IssueAssignee" {
         Add-IssueAssignee -IssueNumber $IssueNumber -Assignee $Assignee -Token $Token -Owner $Owner -RepoName $RepoName
         $output = Get-Content $env:GITHUB_OUTPUT
         $output | Should -Contain "result=failure"
-        $output | Should -Contain "error-message=Failed to assign issue to test-user. Status: 403"
+        $output | Should -Contain "error-message=Error: Failed to assign issue to test-user. Status: 403"
     }
 
     It "assign_issue fails with empty issue_number" {
@@ -107,4 +107,49 @@ Describe "Add-IssueAssignee" {
         $output | Should -Contain "result=failure"
         $output | Should -Contain "error-message=Missing required parameters: issue_number, assignee, repo_name, owner, and token must be provided."
     }
+	
+	It "writes result=failure and error-message on GET exception" {
+		Mock Invoke-WebRequest { throw "API Error" }
+
+		Add-IssueAssignee -IssueNumber $IssueNumber -Assignee $Assignee -Token $Token -Owner $Owner -RepoName $RepoName
+
+		$output = Get-Content $env:GITHUB_OUTPUT
+		$output | Should -Contain "result=failure"
+
+		$output |
+			Where-Object { $_ -match "^error-message=Error: Failed to fetch issue details\. Exception:" } |
+			Should -Not -BeNullOrEmpty
+	}
+	
+	It "writes result=failure and error-message on GET exception" {
+		Mock Invoke-WebRequest { throw "API Error" }
+
+		Add-IssueAssignee -IssueNumber $IssueNumber -Assignee $Assignee -Token $Token -Owner $Owner -RepoName $RepoName
+
+		$output = Get-Content $env:GITHUB_OUTPUT
+		$output | Should -Contain "result=failure"
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to fetch issue details\. Exception:" } |
+			Should -Not -BeNullOrEmpty
+	}
+	
+	It "writes result=failure and error-message on POST exception" {
+		$script:called = 0
+		Mock Invoke-WebRequest {
+			$script:called++
+			if ($script:called -eq 1) {
+				# GET issue details succeeds
+				[PSCustomObject]@{ StatusCode = 200; Content = '{"assignees": []}' }
+			} else {
+				# POST assign throws
+				throw "API Error"
+			}
+		}
+
+		Add-IssueAssignee -IssueNumber $IssueNumber -Assignee $Assignee -Token $Token -Owner $Owner -RepoName $RepoName
+
+		$output = Get-Content $env:GITHUB_OUTPUT
+		$output | Should -Contain "result=failure"
+		$output | Where-Object { $_ -match "^error-message=Error: Failed to assign issue to $Assignee\. Exception:" } |
+			Should -Not -BeNullOrEmpty
+	}
 }
