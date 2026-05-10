@@ -28,10 +28,10 @@ function Add-IssueAssignee {
     # Fetch current assignees
     $issueUri = "$apiBaseUrl/repos/$Owner/$RepoName/issues/$IssueNumber"
     $headers = @{
-        Authorization  = "Bearer $Token"
-        Accept         = "application/vnd.github.v3+json"
+        Authorization = "Bearer $Token"
+        Accept = "application/vnd.github.v3+json"
+		"X-GitHub-Api-Version" = "2026-03-10"
         "Content-Type" = "application/json"
-        "User-Agent"   = "pwsh-action"
     }
 
     try {
