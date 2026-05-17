@@ -35,4 +35,9 @@ runs:
       shell: pwsh
       run: |
         . "${{ github.action_path }}/action.ps1"
-        Add-IssueAssignee "${{ inputs.issue-number }}" "${{ inputs.assignee }}" "${{ inputs.token }}" "${{ inputs.owner }}" "${{ inputs.repo-name }}"
+        Add-IssueAssignee `
+          -IssueNumber "${{ inputs.issue-number }}" `
+          -Assignee "${{ inputs.assignee }}" `
+          -Token "${{ inputs.token }}" `
+          -Owner "${{ inputs.owner }}" `
+          -RepoName "${{ inputs.repo-name }}"
