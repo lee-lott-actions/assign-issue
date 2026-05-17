@@ -17,16 +17,12 @@ function Add-IssueAssignee {
         Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=Missing required parameters: issue_number, assignee, repo_name, owner, and token must be provided."
         Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
         return
-    }
-    
-    Write-Host "Debug: Checking assignees for issue #$IssueNumber"
+    }       
 
     # Use MOCK_API if set, otherwise default to GitHub API
     $apiBaseUrl = $env:MOCK_API
-    if (-not $apiBaseUrl) { $apiBaseUrl = "https://api.github.com" }
-    
-    # Fetch current assignees
-    $issueUri = "$apiBaseUrl/repos/$Owner/$RepoName/issues/$IssueNumber"
+    if (-not $apiBaseUrl) { $apiBaseUrl = "https://api.github.com" }    
+	
     $headers = @{
         Authorization = "Bearer $Token"
         Accept = "application/vnd.github.v3+json"
@@ -35,7 +31,9 @@ function Add-IssueAssignee {
     }
 
     try {
-        $issueResponse = Invoke-WebRequest -Uri $issueUri -Headers $headers -Method Get
+		Write-Host "Checking assignees for issue #$IssueNumber"
+		$issueUri = "$apiBaseUrl/repos/$Owner/$RepoName/issues/$IssueNumber"
+        $issueResponse = Invoke-WebRequest -Uri $issueUri -Headers $headers -Method Get -SkipHttpErrorCheck
 		
 	    if ($issueResponse.StatusCode -ne 200) {
 			$errorMsg = "Error: Failed to fetch issue details. Status: $($issueResponse.StatusCode)"
@@ -69,21 +67,20 @@ function Add-IssueAssignee {
         Write-Host "Issue #$IssueNumber is already assigned to $Assignee, skipping assignment"
     } else {
         Write-Host "Assigning issue #$IssueNumber to $Assignee"
-
         $assignUri = "$apiBaseUrl/repos/$Owner/$RepoName/issues/$IssueNumber/assignees"
         $body = @{ assignees = @($Assignee) } | ConvertTo-Json
 
         try {
-            $assignResp = Invoke-WebRequest -Uri $assignUri -Headers $headers -Method Post -Body $body
+            $assignResp = Invoke-WebRequest -Uri $assignUri -Headers $headers -Method Post -Body $body -SkipHttpErrorCheck
 
-			if ($assignResp.StatusCode -ne 201) {
+			if ($assignResp.StatusCode -eq 201) {
+				Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
+				Write-Host "Successfully assigned issue #$IssueNumber to $Assignee"
+			} else {
 				$errorMsg = "Error: Failed to assign issue to $Assignee. Status: $($assignResp.StatusCode)"
 				Add-Content -Path $env:GITHUB_OUTPUT -Value "result=failure"
 				Add-Content -Path $env:GITHUB_OUTPUT -Value "error-message=$errorMsg"
-				Write-Host $errorMsg
-			} else {
-				Add-Content -Path $env:GITHUB_OUTPUT -Value "result=success"
-				Write-Host "Successfully assigned issue #$IssueNumber to $Assignee"
+				Write-Host $errorMsg				
 			}
         } catch {
 			$errorMsg = "Error: Failed to assign issue to $Assignee. Exception: $($_.Exception.Message)"
